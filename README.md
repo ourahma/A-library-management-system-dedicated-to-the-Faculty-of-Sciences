@@ -33,45 +33,10 @@ This project is a comprehensive library management system designed to simplify a
 
 ## Technologies Used
 - **Backend**: Django (Python)
-- **Frontend**: HTML, CSS, JavaScript (with Django templates)
-- **Database**: SQLite (default) or PostgreSQL/MySQL (configurable)
+- **Frontend**: HTML, CSS, JavaScript (with Django templates), Bootstrap
+- **Database**: SQLite (default)
 - **Authentication**: Django's built-in authentication system
 
-## Installation
-
-1. **Clone the repository**:
-    ```bash
-    git clone https://github.com/yourusername/library-management-system.git
-    cd library-management-system
-    ```
-
-2. **Create and activate a virtual environment**:
-    ```bash
-    python -m venv env
-    source env/bin/activate  # On Windows use `env\Scripts\activate`
-    ```
-
-3. **Install dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4. **Run database migrations**:
-    ```bash
-    python manage.py migrate
-    ```
-
-5. **Create a superuser**:
-    ```bash
-    python manage.py createsuperuser
-    ```
-
-6. **Start the development server**:
-    ```bash
-    python manage.py runserver
-    ```
-
-7. Open your browser and go to `http://127.0.0.1:8000/`.
 
 ## Usage
 
@@ -87,22 +52,10 @@ This project is a comprehensive library management system designed to simplify a
 4. **Reporting System**:
    - Users can report lost or damaged books, and librarians can process these reports to keep the inventory accurate.
 
-## Contributing
 
-Contributions are welcome! To contribute:
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b new-feature`).
-3. Commit your changes (`git commit -m 'Add new feature'`).
-4. Push to the branch (`git push origin new-feature`).
-5. Open a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
 For questions or inquiries, feel free to contact:
-- **Email**: your.email@example.com
-- **GitHub**: [yourusername](https://github.com/yourusername)
+- **GitHub**: [ourahma](https://github.com/ourahma)
 
