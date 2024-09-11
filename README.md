@@ -32,10 +32,14 @@ This project is a comprehensive library management system designed to simplify a
    - **Description**: Users can report lost or damaged copies of books, and librarians can handle and resolve these reports to ensure the library's inventory is up to date.
 
 ## Technologies Used
-- **Backend**: Django (Python)
-- **Frontend**: HTML, CSS, JavaScript (with Django templates), Bootstrap
-- **Database**: SQLite (default)
-- **Authentication**: Django's built-in authentication system
+
+- ![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white) **Django (Python)**
+- ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white) **HTML**
+- ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white) **CSS**
+- ![JavaScript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E) **JavaScript (with Django templates)**
+- ![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white) **Bootstrap**
+- ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white) **SQLite**
+- ![Django Authentication](https://img.shields.io/badge/Authentication-Django-informational?style=for-the-badge&logo=django) **Django Authentication**
 
 
 ## Usage
