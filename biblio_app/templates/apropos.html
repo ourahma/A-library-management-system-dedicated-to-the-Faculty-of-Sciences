@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<main>
+
+    <div class="apropos_nous">
+        <h3>À propos de notre bibliothèque</h3>
+        <p>
+        Notre bibliothèque est bien plus qu’un simple lieu de stockage de livres. 
+        Nous sommes une plateforme dynamique qui facilite l’accès à la connaissance et à la culture. Voici les services que nous proposons</p>
+    </div>
+        <div class="services">
+            
+            <div class="services_card">
+                <div class="card" style="width: 18rem;">
+                    <img src="{% static 'assets/emprunter.jpeg' %}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                      <h5 class="card-title">Emprunt de livres</h5>
+                      <p class="card-text">Vous pouvez emprunter vos livres préférés parmi notre vaste collection. Que vous soyez passionné de fiction,
+                         d’histoire, de sciences ou de littérature, nous avons des titres pour tous les goûts</p>
+                      {% comment %} <a href="#" class="btn btn-primary">Go somewhere</a> {% endcomment %}
+                    </div>
+                  </div>
+                  <div class="card" style="width: 18rem;">
+                    <img src="{% static 'assets/reserver.jpeg' %}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                      <h5 class="card-title">Réservation de livres</h5>
+                      <p class="card-text">Si un livre est déjà emprunté, vous pouvez le réserver. Dès qu’il 
+                        sera disponible, nous vous informerons pour que vous puissiez venir le chercher..</p>
+                      {% comment %} <a href="#" class="btn btn-primary">Go somewhere</a> {% endcomment %}
+                    </div>
+                  </div>
+                  <div class="card" style="width: 18rem;">
+                    <img src="{% static 'assets/lire.jpeg' %}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                      <h5 class="card-title">Lecture sur place</h5>
+                      <p class="card-text"> Notre espace de lecture est accueillant et confortable. Installez-vous avec un bon livre, une tasse de café et plongez dans l’univers des mots.</p>
+                      {% comment %} <a href="#" class="btn btn-primary">Go somewhere</a> {% endcomment %}
+                    </div>
+                  </div>
+                  <div class="card" style="width: 18rem;">
+                    <img src="{% static 'assets/assistance.jpeg' %}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                      <h5 class="card-title">Assistance du bibliothécaire</h5>
+                      <p class="card-text"> Notre équipe de bibliothécaires est là pour vous aider. Besoin de recommandations de lecture, d’aide pour la recherche d’informations ou de conseils 
+                        sur l’utilisation de nos services ? Nous sommes à votre disposition.</p>
+                      {% comment %} <a href="#" class="btn btn-primary">Go somewhere</a> {% endcomment %}
+                    </div>
+                  </div>
+            </div>
+        </div>
+</main>
+    
+    <link rel="stylesheet" href="{% static 'css/apropos.css' %}">
+
+{% endblock content %}
+
+

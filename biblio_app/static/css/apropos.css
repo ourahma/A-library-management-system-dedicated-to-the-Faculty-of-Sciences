@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+main {
+  display: flex;
+  flex-direction: column;
+}
+.apropos_nous h3{
+    margin: 30px ;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+}
+.apropos_nous p{
+    margin: 20px 40px;
+    font-size: 16px;
+}
+.services_card {
+  margin: 20px 10px 20px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+h5{
+  
+}

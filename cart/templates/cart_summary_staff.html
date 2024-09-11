@@ -1,0 +1,352 @@
+{% extends 'admin_nav.html' %}
+{% block content %}
+<!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<br /><br />
+<style>
+  .exemplaire_actions i,
+  .exemplaire_actions button i {
+    margin-right: 5px;
+  }
+</style>
+
+<div class="container-fluid justify-content-center align-items-center">
+  <div class="row">
+    {% if cart_exemplaires %}
+    <center>
+      <div class="row">
+        <div class="col">
+          <button type="button" 
+            id="deleteAllfromBin" 
+            class="btn btn-danger">
+            <i class="bi bi-trash-fill"></i>
+            Supprimer Tous
+          </button>
+         
+          <button type="button" 
+            id="emprunterTous"
+            class="btn btn-warning"
+            {% if disable %} disabled {% endif %}>
+            <i class="bi bi-hourglass-split"></i>
+            Emprunter Tous
+          </button>
+        </div>
+      </div>
+    </center>
+    <br><br><br>
+      {% for cart_exemplaire in cart_exemplaires %}
+        <div class="col-12">
+          <div class="card mb-3">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img src="{{ cart_exemplaire.image.url }}" class="img-fluid rounded-start" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{ cart_exemplaire.titre }}</h5>
+                  <p class="card-text">
+                    <br>
+                    <strong>Description : </strong>{{ cart_exemplaire.description }}</p>
+                    <strong>Type : </strong>{{ cart_exemplaire.type }}</p>
+                    <strong>Categorie : </strong>{{ cart_exemplaire.categorie.nom_categorie }} {{cart_exemplaire.ouvrage.num_exmp_dispo}}</p><br>
+                  <div class="exemplaire_actions">
+                   
+                    <button type="button" data-index="{{ cart_exemplaire.ISBN }}" 
+                      id="emprunter" data-toggle="modal" data-target="#emprunterModal"
+                      class="btn btn-warning"
+                      
+                      {% if  cart_exemplaire.num_exmp_dispo <= 1 %}
+                        disabled
+                      {% endif %}>
+                      <i class="bi bi-hourglass-split"></i>
+                      Emprunter 
+                    </button> 
+                    <button type="button" data-index="{{ cart_exemplaire.ISBN }}" 
+                      id="consulter" data-toggle="modal" data-target="#consulterModal"
+                      class="btn btn-warning">
+                      <i class="bi bi-book-half"></i>
+                      Consulter
+                    </button>
+                    <button type="button" data-index="{{ cart_exemplaire.ISBN }}" 
+                      id="supprimer_ex"
+                      class="btn btn-danger">
+                      <i class="bi bi-trash-fill"></i>
+                      Supprimer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <br><br><b><br><br><br><br><br>
+      <center><h4>Vous n'avez ajouté aucun exemplaire !!</h4></center>
+      <br><br><b><br><br><br><br><br>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Emprunter Modal -->
+<div class="modal fade" id="emprunterModal" tabindex="-1" aria-labelledby="emprunterModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="emprunterModalLabel">Emprunter</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="emprunterForm">
+          <div class="form-group">
+            <label for="id_ouvrage">ID Ouvrage:</label>
+            <input type="text" class="form-control" id="id_ouvrage" name="id_ouvrage" readonly>
+          </div>
+          <div class="form-group">
+            <label for="user_email">Email:</label>
+            <input type="email" class="form-control" id="user_email" name="user_email" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary" id="sendRequestBtn">Emprunter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Consulter Modal -->
+<div class="modal fade" id="consulterModal" tabindex="-1" aria-labelledby="emprunterModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="consulterModalLabel">Consulter sur place</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="emprunterForm">
+          <div class="form-group">
+            <label for="id_ouvrage">ID Ouvrage:</label>
+            <input type="text" class="form-control" id="id_ouvrage_cons" name="id_ouvrage" readonly>
+          </div>
+          <div class="form-group">
+            <label for="user_email">Email:</label>
+            <input type="email" class="form-control" id="user_email_cons" name="user_email" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary" id="sendRequestBtn_cons">Consulter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Emprunter Tous Modal -->
+<div class="modal fade" id="emprunterTousModal" tabindex="-1" aria-labelledby="emprunterModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="emprunterModalLabel">Emprunter</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="emprunterForm">
+          <div class="form-group">
+            <label for="user_email">Email:</label>
+            <input type="email" class="form-control" id="user_email_all" name="user_email" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary" id="sendRequestBtnAll">Emprunter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).on('click','#supprimer_ex',function(e){
+  e.preventDefault();
+  var ouvrage_isbn=$(this).data('index');
+  console.log(ouvrage_isbn)
+  $.ajax({
+      type:'POST',
+      url:"{% url 'cart_delete' %}",
+      data:{
+          ouvrage_isbn:$(this).data('index'),
+          csrfmiddlewaretoken:'{{ csrf_token }}',
+          action: 'post'
+      },
+      success:function(json){
+         location.reload();
+      },
+      error:function(xbr,errmsg,err){
+        location.reload();
+          console.log(err)
+      }
+  })
+});
+
+$(document).on('click','#deleteAllfromBin',function(e){
+  e.preventDefault();
+  var ouvrage_isbn=$(this).data('index');
+  $.ajax({
+      type:'POST',
+      url:"{% url 'deleteAllfromBin' %}",
+      data:{
+          csrfmiddlewaretoken:'{{ csrf_token }}',
+          action: 'post'
+      },
+      success:function(json){
+         location.reload();
+      },
+      error:function(xbr,errmsg,err){
+        location.reload();
+          console.log(err)
+      }
+  })
+})
+
+$(document).on('click', '#emprunter', function(e) {
+    e.preventDefault();
+    var ouvrage_isbn = $(this).data('index');
+    $('#id_ouvrage').val(ouvrage_isbn);
+  });
+
+  $(document).on('click', '#sendRequestBtn', function(e) {
+    e.preventDefault();
+    $('#emprunterModal').modal('hide');
+    var ouvrage_isbn = $('#id_ouvrage').val();
+    var user_email = $('#user_email').val();
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'emprunter_un' %}",
+        data: {
+            isbn: ouvrage_isbn,
+            user_email: user_email,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            action: 'post'
+        },
+        success: function(json) {
+            // Handle success response
+            location.reload();
+            console.log(json);
+        },
+        error: function(xhr, errmsg, err) {
+            // Handle error response
+            console.log(err);
+            if (xhr.responseJSON && xhr.responseJSON.consulter) {
+                if (confirm('Cet ouvrage ne peut pas être emprunté. Voulez-vous faire une consultation sur place?')) {
+                    // Send form data to the '/consulter' endpoint
+                    $.ajax({
+                        type: 'POST',
+                        url: "{% url 'consulter_staff' %}",  // Adjust this URL if necessary
+                        data: {
+                            isbn: ouvrage_isbn,
+                            user_email: user_email,
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                            action: 'consult'
+                        },
+                        success: function(response) {
+                            location.reload();
+                            console.log(response);
+                        },
+                        error: function(xhr, errmsg, err) {
+                            location.reload();
+                            console.log(err);
+                        }
+                    });
+                }
+            } else {
+                location.reload();
+            }
+        }
+    });
+});
+
+$(document).on('click', '#consulter', function(e) {
+    e.preventDefault();
+    var ouvrage_isbn = $(this).data('index');
+    $('#id_ouvrage_cons').val(ouvrage_isbn);
+  });
+
+  $(document).on('click', '#sendRequestBtn_cons', function(e) {
+    e.preventDefault();
+    $('#consulterModal').modal('hide');
+    var ouvrage_isbn = $('#id_ouvrage_cons').val();
+    var user_email = $('#user_email_cons').val();
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'consulter_staff' %}",
+        data: {
+            isbn: ouvrage_isbn,
+            user_email: user_email,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            action: 'post'
+        },
+        success: function(json) {
+            // Handle success response
+            location.reload();
+            console.log(json);
+        },
+        error: function(xhr, errmsg, err) {
+            // Handle error response
+            location.reload();
+            console.log(err);
+        }
+    });
+});
+
+$(document).on('click', '#emprunterTous', function(e) {
+    e.preventDefault();
+    $('#emprunterTousModal').modal('show');
+});
+
+$(document).on('click', '#sendRequestBtnAll', function(e) {
+    e.preventDefault();
+    var user_email = $('#user_email_all').val();
+    $('#emprunterTousModal').modal('hide');
+    
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'emprunter_tous' %}",
+        data: {
+            user_email: user_email,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            action: 'post'
+        },
+        success: function(json) {
+            // Handle success response
+            console.log(json);
+            // Close the modal after successful submission
+            $('#emprunterModal').modal('hide');
+            location.reload()
+        },
+        error: function(xhr, errmsg, err) {
+            // Handle error response
+            console.log(err);
+            location.reload();
+        }
+    });
+});
+</script>
+
+<br>
+{% endblock content %}

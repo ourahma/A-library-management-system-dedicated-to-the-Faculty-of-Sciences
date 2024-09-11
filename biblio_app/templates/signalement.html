@@ -1,0 +1,365 @@
+
+{% extends 'admin_nav.html' %} {% load static %}{% block content %}
+  <title>Ajouter Catégorie</title>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+    /* Add custom CSS styles for table */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    /* Add margin to pagination */
+    .pagination {
+      margin-top: 20px;
+    }
+  </style>
+
+<div class="container mt-5">
+  <h2>Signalement</h2>
+<br><br>
+
+
+   <!-- Search form
+   <form class="form-inline mb-3" id="searchForm">
+    <div class="form-group mr-2">
+      <label for="searchByName">Recherche par nom :</label>
+      <input type="text" class="form-control ml-2" id="searchByName" placeholder="Nom">
+    </div>
+    <div class="form-group mr-2">
+      <label for="searchById">Recherche par ID :</label>
+      <input type="text" class="form-control ml-2" id="searchById" placeholder="ID">
+    </div>
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+  </form> -->
+
+
+
+   
+   <!-- Bootstrap Modal pour la modification -->
+   <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" aria-labelledby="modifyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modifyModalLabel">Modifier le signalement</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="modifySignalementForm" method="post" action="{% url 'modifier_signalement' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="modifiedSignalementName">ID :</label>
+                        <input type="text" class="form-control" id="signalementId" name="id_signalement" readonly>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perdu" name="perdu">
+                            <label class="form-check-label" for="perdu">Perdu</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="deteriorie" name="deteriorie">
+                            <label class="form-check-label" for="deteriorie">Deteriorie</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-primary" id="modifySignalementSubmit">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+  <div class="mt-5">
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Utilisateurs</th>
+          <th>Ouvrage</th>
+          <th>Perte</th>
+          <th>Deterioration</th> 
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for signalement in signalements %}
+          <tr>
+            <td>{{ signalement.id }}</td>
+            <td>{{ signalement.utilisateur }}</td>
+           
+            <td>
+              <div class="row">
+                <div class="col-auto">
+                  <img src="{{ signalement.ouvrage.image.url }}" alt="{{ signalement.ouvrage.title }}" style="max-width: 100px; max-height: 100px;">
+                </div>
+                <div class="col">
+                  <p><strong>Titre:</strong> {{ signalement.ouvrage.titre }}</p>
+                  <p><strong>Type:</strong> {{ signalement.ouvrage.type }}</p>
+                  <p><strong>Description:</strong> {{ signalement.ouvrage.description }}</p>
+                  <p><strong>Catégorie:</strong> {{ signalement.ouvrage.categorie }}</p>
+                </div>
+              </div>
+            </td>
+            <td>
+
+              {% if signalement.exemplaire.perdu %}
+              <img src="{% static 'assets/True.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% else %}
+                <img src="{% static 'assets/False.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% endif %}
+            </td>
+            <td>
+              {% if signalement.exemplaire.deteriore %}
+              <img src="{% static 'assets/True.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% else %}
+                <img src="{% static 'assets/False.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% endif %}
+            </td>
+            <td>
+              <div class="row">
+                <div class="col-12 mb-2">
+                  <!-- Button to trigger modification modal -->
+              <button class="btn btn-primary modify-btn" data-toggle="modal"
+              data-target="#modifyModal" data-id_signalement="{{ signalement.id }}"
+              data-perdu="{{ signalement.exemplaire.perdu }}"
+              data-deteriorie="{{ signalement.exemplaire.deteriore }}">
+          Modifier
+                      </button>
+                <!-- Button to trigger deletion (adjust as per your deletion logic) -->
+
+                <button class="btn btn-danger delete-btn" data-id_signalement="{{ signalement.id }}">
+                Supprimer
+                </button>
+
+                {% if signalement.utilisateur.banni %}
+                <button class="btn btn-success unban-btn" data-id="{{ signalement.utilisateur.id }}">Débannir Utilisateur</button>
+                {% else %}
+                <button class="btn btn-danger ban-btn" data-id="{{ signalement.utilisateur.id }}">Bannir Utilisateur</button>
+                {% endif %}
+                </div>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      
+    </table>
+    
+    <!-- Pagination -->
+    <div class="pagination" style="margin-bottom: 15px; margin-top: 10px;">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+              {% if categories.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+              {% endif %}
+              {% for num in categories.paginator.page_range %}
+              <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+              {% endfor %}
+              {% if categories.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+              {% endif %}
+          </ul>
+      </nav>
+    </div>
+</div>
+
+<script>
+  const csrfToken = '{{ csrf_token }}';
+
+  document.querySelectorAll('.ban-btn, .unban-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const utilisateurId = this.dataset.id;
+          const action = this.classList.contains('ban-btn') ? 'bannir' : 'debannir';
+          if (confirm(`Êtes-vous sûr de vouloir ${action} cet utilisateur ?`)) {
+            fetch(`/${action}_utilisateur/${utilisateurId}/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+              }
+            })
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok');
+              return response.json();
+            })
+            .then(data => {
+              console.log(data);
+              location.reload();
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              location.reload();
+            });
+          }
+        });
+      });
+  $(document).ready(function() {
+    // Handle form submission for search
+    $('#searchForm').submit(function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        // Get search values
+        const name = $('#searchByName').val().trim().toLowerCase();
+        const id = $('#searchById').val().trim().toLowerCase();
+
+        // Filter table rows based on search criteria
+        $('tbody tr').each(function() {
+            const rowName = $(this).find('td:eq(1)').text().trim().toLowerCase();
+            const rowId = $(this).find('td:eq(0)').text().trim().toLowerCase();
+
+            // Show or hide table rows based on search criteria
+            if ((name === '' || rowName.includes(name)) && (id === '' || rowId === id)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+
+        // Clear input fields (optional)
+        $('#searchByName').val('');
+        $('#searchById').val('');
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const modifyButtons = document.querySelectorAll('.modify-btn');
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+
+    
+    // Populate modify modal fields when button is clicked
+    modifyButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const signalementId = this.getAttribute('data-id_signalement');
+                    const perdu = this.getAttribute('data-perdu') === 'True';
+                    const deteriorie = this.getAttribute('data-deteriorie') === 'True';
+                    console.log(perdu)
+                    console.log(deteriorie)
+                    document.getElementById('signalementId').value = signalementId;
+                    document.getElementById('perdu').checked = perdu;
+                    document.getElementById('deteriorie').checked = deteriorie;
+                });
+            });
+            //submit the modification form
+
+            document.getElementById('modifySignalementForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    location.reload();
+                });
+            });
+            const csrfToken = '{{ csrf_token }}';
+
+
+
+
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                const signalementId = this.getAttribute('data-id_signalement');
+                console.log(signalementId);
+                if (confirm("Êtes-vous sûr de vouloir supprimer ce signalement ?")) {
+                    deleteSignalement(signalementId);
+                }
+    });
+});
+
+function deleteSignalement(signalementId) {
+  
+    fetch('{% url "supprimer_signalement" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            id_signalement: signalementId,
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        location.reload()
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        location.reload()
+    });
+}
+
+
+        document.querySelector('#modifySignalementForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                //alert(data.message);
+                location.reload(); // Reload the page after successful submission
+            } else {
+                // alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            //alert('An error occurred. Please try again.');
+        });
+    });
+  });
+
+
+
+
+</script>
+{% endblock content%}

@@ -1,0 +1,99 @@
+{% load static %}
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{% for message in messages %}
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+        <!-- Error Modal -->
+        <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="errorModalLabel">Erreur!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-danger">
+                        {{ message }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $('#errorModal').modal('show');
+            setTimeout(function() {
+                $('#errorModal').modal('hide');
+            }, 5000); // Close after 5000 milliseconds (5 seconds)
+        </script>
+    {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+        <!-- Warning Modal -->
+        <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title" id="warningModalLabel">Attention!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-warning">
+                        {{ message }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $('#warningModal').modal('show');
+            setTimeout(function() {
+                $('#warningModal').modal('hide');
+            }, 5000); // Close after 5000 milliseconds (5 seconds)
+        </script>
+    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+        <!-- Info Modal -->
+        <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="infoModalLabel">Informations!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-info">
+                        {{ message }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $('#infoModal').modal('show');
+            setTimeout(function() {
+                $('#infoModal').modal('hide');
+            }, 5000); // Close after 5000 milliseconds (5 seconds)
+        </script>
+    {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+        <!-- Success Modal -->
+        <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="successModalLabel">Succès!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-success">
+                        {{ message }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $('#successModal').modal('show');
+            setTimeout(function() {
+                $('#successModal').modal('hide');
+            }, 5000); // Close after 5000 milliseconds (5 seconds)
+        </script>
+    {% endif %}
+{% endfor %}

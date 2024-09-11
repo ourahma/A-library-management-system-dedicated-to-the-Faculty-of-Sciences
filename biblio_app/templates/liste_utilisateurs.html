@@ -1,0 +1,253 @@
+{% extends 'admin_nav.html' %}
+
+{% block content %}
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    
+    button{
+      margin: 5px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .pagination {
+      margin-top: 20px;
+    }
+  </style>
+  
+  <div class="container mt-5">
+    <input type="text" class="form-control mb-3" id="searchInput" placeholder="Rechercher utilisateur">
+
+    <div class="modal fade" id="modifierModal" tabindex="-1" role="dialog" aria-labelledby="modifierModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modifierModalLabel">Modifier Admin superieure</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="modifierForm" method="post" action="{% url 'modifier_utilisateur' %}" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form-group">
+                <input type="text" class="form-control" id="utilisateur_id" name="id" readonly><br><br>
+
+                <label for="nnom">Nouveau nom:</label>
+                <input type="text" class="form-control" id="nnom" name="nom" required><br><br>
+
+                <label for="nprenom">Nouveau prenom:</label>
+                <input type="text" class="form-control" id="nprenom" name="prenom" required><br><br>
+
+                <label for="ntelephone">Nouveau Telephone:</label>
+                <input type="text" class="form-control" id="ntelephone" name="telephone" required><br><br>            
+                
+                <label for="nemail">Nouveau email:</label>
+                <input type="email" class="form-control" id="nemail" name="email" pattern="[^@\s]+@(edu\.)?umi\.ac\.ma" required><br><br>
+                
+                <label for="npassword">Nouveau Password:</label>
+                <input type="text" class="form-control" id="npassword" name="password" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"><br><br>
+              </div>  
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-primary" id="modifierSubmit">Enregistrer</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5">
+      <h2>Utilisateurs</h2>
+      <table class="table">
+        <thead>
+          <tr> 
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Email</th>
+            <th>Telephone</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for utilisateur in utilisateurs %}
+            <tr>
+              <td>{{ utilisateur.id }}</td>
+              <td>{{ utilisateur.nom }}</td>
+              <td>{{ utilisateur.prenom }}</td>
+              <td>{{ utilisateur.email }}</td>
+              <td>{{ utilisateur.telephone }}</td>
+              <td>
+                <button class="btn btn-primary modifier-btn" data-toggle="modal" data-target="#modifierModal"
+                  data-utilisateur-id="{{ utilisateur.id }}"
+                  data-nom="{{ utilisateur.nom }}"
+                  data-prenom="{{ utilisateur.prenom }}"
+                  data-email="{{ utilisateur.email }}"
+                  data-telephone="{{ utilisateur.telephone }}">
+                  Modifier
+                </button><br>
+                
+                {% if utilisateur.banni %}
+                  <button class="btn btn-success unban-btn" data-id="{{ utilisateur.id }}">Débannir</button>
+                {% else %}
+                  <button class="btn btn-danger ban-btn" data-id="{{ utilisateur.id }}">Bannir</button>
+                {% endif %}
+                
+                <button class="btn btn-danger delete-btn" data-id="{{ utilisateur.id }}">Supprimer</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            {% if utilisateurs.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ utilisateurs.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            {% for num in utilisateurs.paginator.page_range %}
+              <li class="page-item {% if utilisateurs.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+              </li>
+            {% endfor %}
+            {% if utilisateurs.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ utilisateurs.next_page_number }}">Next</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('searchInput').addEventListener('input', function () {
+        const searchText = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('tbody tr');
+
+        tableRows.forEach(row => {
+          let found = false;
+          row.querySelectorAll('td').forEach(cell => {
+            const cellText = cell.textContent.toLowerCase();
+            if (cellText.includes(searchText)) {
+              found = true;
+            }
+          });
+
+          row.style.display = found ? '' : 'none';
+        });
+      });
+
+      document.querySelectorAll('.modifier-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const utilisateur = this.dataset;
+          document.getElementById('utilisateur_id').value = utilisateur.utilisateurId;
+          document.getElementById('nnom').value = utilisateur.nom;
+          document.getElementById('nprenom').value = utilisateur.prenom;
+          document.getElementById('ntelephone').value = utilisateur.telephone;
+          document.getElementById('nemail').value = utilisateur.email;
+          document.getElementById('npassword').value = utilisateur.password || '';
+        });
+      });
+
+      document.getElementById('modifierForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        $('#modifierModal').modal('hide')
+        const formData = new FormData(this);
+        fetch(this.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            location.reload();
+          } else {
+            location.reload();
+            console.error('Modification failed:', data);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          location.reload();
+        });
+      });
+
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const utilisateurId = this.dataset.id;
+          if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+            fetch(`/supprimer_utilisateur/${utilisateurId}/`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+              }
+            })
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok');
+              return response.json();
+            })
+            .then(data => {
+              console.log(data);
+              location.reload();
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              location.reload();
+            });
+          }
+        });
+      });
+
+      document.querySelectorAll('.ban-btn, .unban-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const utilisateurId = this.dataset.id;
+          const action = this.classList.contains('ban-btn') ? 'bannir' : 'debannir';
+          if (confirm(`Êtes-vous sûr de vouloir ${action} cet utilisateur ?`)) {
+            fetch(`/${action}_utilisateur/${utilisateurId}/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+              }
+            })
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok');
+              return response.json();
+            })
+            .then(data => {
+              console.log(data);
+              location.reload();
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              location.reload();
+            });
+          }
+        });
+      });
+    });
+  </script>
+{% endblock %}

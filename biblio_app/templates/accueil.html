@@ -1,0 +1,32 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<link rel="stylesheet" href="{% static 'css/accueil.css' %}" />
+<section class="page_acceuil">
+  <section class="acceuil_header">
+    <div class="main-tag">
+      <h2>Bienvenue Chez <span>Biblio Tech</span></h2>
+
+      <p>
+        Notre système de gestion de bibliothèque moderne et efficace facilite
+        l’accès à une vaste collection de livres, magazines et ressources
+        numériques. Que vous soyez un passionné de littérature, un chercheur ou
+        un étudiant, notre plateforme conviviale vous permettra de découvrir,
+        emprunter et explorer des œuvres variées. Explorez notre catalogue,
+        réservez vos livres préférés et suivez vos emprunts en toute simplicité.
+        Nous sommes ravis de vous accompagner dans votre quête de connaissances
+      </p>
+      <a href="{% url 'apropos' %}" class="main_btn" style="color: black"
+        >Savoire plus</a
+      >
+    </div>
+    <div class="main_img">
+      <img src="{% static 'assets/accueil.jpeg' %}" alt="Image principale" />
+    </div>
+  </section>
+
+  <section class="display_exemplaires">
+    <br><br><br><br>
+    {% include 'exemplaires.html' %}
+  </section>
+</section>
+
+{% endblock content %}

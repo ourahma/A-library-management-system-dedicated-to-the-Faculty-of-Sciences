@@ -1,0 +1,187 @@
+{% extends 'admin_nav.html' %}
+{% block content %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        button{
+        margin: 5px;
+        }
+        /* Add custom CSS styles for table */
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
+    
+        th, td {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+    
+        th {
+          background-color: #f2f2f2;
+        }
+    
+        /* Add margin to pagination */
+        .pagination {
+          margin-top: 20px;
+        }
+      </style>
+    <script>
+        function handleRejeterClick(idReservation) {
+        const confirmation = confirm("Êtes-vous sûr de vouloir rejeter cette réservation ?");
+        
+        if (confirmation) {
+            fetch(`/rejeter_reservation/${idReservation}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}' 
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La réponse du réseau n\'était pas correcte');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Traitement de la réponse en cas de succès
+                console.log(data);
+                // Redirection vers une autre page
+                location.reload();
+            })
+            .catch(error => {
+                // Gestion des erreurs
+                console.error('Erreur :', error);
+                location.reload();
+            });
+        }
+    }
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // Recherche par email
+            document.getElementById('searchEmail').addEventListener('input', function () {
+                const searchText = this.value.toLowerCase();
+                filterRows(searchText);
+            });
+    
+            // Recherche par ID ou Titre d'ouvrage
+            document.getElementById('searchOuvrage').addEventListener('input', function () {
+                const searchText = this.value.toLowerCase();
+                filterRows(searchText);
+            });
+    
+            function filterRows(searchText) {
+                const tableRows = document.querySelectorAll('tbody tr');
+                
+                tableRows.forEach(row => {
+                    const email = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+                    const id = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                    const title = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                    
+                    if (email.includes(searchText) || id.includes(searchText) || title.includes(searchText)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Page d'Emprunt</h1>
+        
+        <div class="mb-4">
+            <h2>Réservations à Confirmer</h2>
+            <!-- Search Input -->
+            <input type="text" class="form-control mb-3" id="searchEmail" placeholder="Rechercher par email">
+            <input type="text" class="form-control" id="searchOuvrage" placeholder="Rechercher par ID ou Titre d'ouvrage"><br>
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID d'ouvrage</th>
+                        <th>Titre d'ouvrage</th>
+                        <th>Auteur d'ouvrage</th>
+                        <th>Image d'ouvrage</th>
+                        <th>Utilisateur</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                    <tr>
+                        <td>{{ reservation.ouvrage.ISBN }}
+                            date debut d'emprunt {{ reservation.date_emprunt }}
+                            date reservation {{ reservation.date_reservation }}
+                        </td>
+                        <td>{{ reservation.ouvrage.titre }}</td>
+                        <td>{{ reservation.ouvrage.auteur }}</td>
+                        <td><img src="{{ reservation.ouvrage.image.url }}" style="max-width: 60%; height: auto;"></td>
+                        <td>{{ reservation.id_utilisateur.email }}</td>
+                        <td>
+                            <form id="emprunterForm" method="post" action="{% url 'reservation_to_emprunt' reservation.id_reservation%}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" data-id_reservation="{{ reservation.id_reservation }}">Emprunter</button>
+                            </form>
+                            <button type="button" class="btn btn-danger delete-btn" onclick="handleRejeterClick('{{ reservation.id_reservation }}')">Rejeter</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+  <div class="pagination">
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if reservations.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            {% for num in reservations.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endfor %}
+            {% if reservations.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+  </div>
+    </div>
+    <script>
+document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'emprunterForm') {
+        event.preventDefault();
+
+        // Send AJAX request
+        var formData = new FormData(event.target);
+        fetch(event.target.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Replace with your CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle JSON response
+            console.log(data);
+            // Reload the page only if needed
+            if (data.message) {
+                location.reload();
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            location.reload();
+        });
+    }
+});
+    </script>
+    {% endblock content %}

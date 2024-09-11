@@ -1,0 +1,44 @@
+{% extends 'base.html' %} 
+
+{% load static %}
+
+
+{% block content %}
+<div class="container_login_form">
+   <br><br><br><br>
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <form method="post" action="{% url 'login_user' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email</label>
+            <input
+              type="text"
+              class="form-control"
+              name="email"
+              placeholder="Entez votre Email"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">le Mot de passe</label>
+            <input
+              name="password"
+              type="password"
+              class="form-control"
+              placeholder="Enter votre mot de passe"
+              required
+            />
+          </div>
+  
+          <button type="submit" class="btn btn-secondary">Se connecter</button>
+          <div class="mt-3">
+            <a href="{% url 'password_reset' %}" class="btn btn-link">Mot de passe oublié ?</a>
+          </div>
+        </form>
+        
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+    

@@ -1,0 +1,22 @@
+{% extends 'admin_nav.html' %} {% load static %} {% block content %}
+
+
+<div class="container">
+  <br /><br /><br />
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <form method="post" action="{% url 'update_paswd' %}">
+        {% csrf_token %} {{ form.as_p }}
+
+        <br /><br />
+
+        <button type="submit" class="btn btn-secondary">Update Password</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<br /><br /><br />
+<br /><br /><br />
+
+{% endblock content %}

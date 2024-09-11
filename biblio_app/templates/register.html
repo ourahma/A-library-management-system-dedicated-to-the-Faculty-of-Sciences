@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<!-- Header-->
+
+
+<div class="container">
+  <br /><br /><br />
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <form method="post" action="{% url 'register' %}" enctype="multipart/form-data">
+        {% csrf_token %} {{ form.as_p }}
+        
+
+        <br /><br />
+        <input type="hidden" name="role" value="UTILISATEUR">
+        <button type="submit" class="btn btn-secondary">S'inscrire</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<br /><br /><br />
+<br /><br /><br />
+<br /><br /><br /><br /><br /><br /><br /><br /><br />
+{% endblock content %}

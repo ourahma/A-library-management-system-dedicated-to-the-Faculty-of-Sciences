@@ -1,0 +1,8 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktranslate %}
+Vous recevez cet email car l'utilisateur {{ user.email }} 
+a envoyé un message depuis le formulaire de contact dans le site:{% endblocktranslate %}
+{% translate 'le contenu de message est :' %} {{ message }}
+{% blocktranslate %}{% endblocktranslate %}
+{% endautoescape %}

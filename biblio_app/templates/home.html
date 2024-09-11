@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+{% extends 'base.html' %} {%load static %} {% block main_content %}
+
+<div class="main">
+  <div class="col-md-8" style="background-color: white">
+    <div class="row">
+      <div class="container-fluid justify-content-center align-items-center">
+        <form class="d-flex" role="search" method="GET" action="/search">
+          <input
+            class="form-control me-2"
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+            name="search_value"
+          />
+          <select name="search_key">
+            <option value="exemplaire">
+              Rechercher exemplaire par son identificateur
+            </option>
+            <option value="categorie">Rechercher Categorie par le nom</option>
+            <option value="ouvrage_type">Rechercher Ouvrage par le type</option>
+          </select>
+          <button
+            class="btn btn-outline-primary"
+            type="submit"
+            style="background-color: white"
+          >
+            Search
+          </button>
+        </form>
+      </div>
+    </div>
+    <div>
+      {% if messages %}
+      <h1>Error</h1>
+      <p>{{ messages }}</p>
+      {% endif %}
+      {% if exemplaires %}
+        {{exemplaires}}
+      {% endif %}
+        
+      {% if resultat %}
+      <h2>Search Results:</h2>
+      <ul>
+        {% for item in resultat %}
+        <li>{{ item.isbn}}</li>
+        {% endfor %}
+      </ul>
+
+      {% endif %}
+    </div>
+    <div class="container-fluid">
+      
+    </div>
+     {% if resultat %} 
+     
+     {% if result_type == "Exemplaire" %}
+      Exemplaire
+     {% endif %}
+      
+     {{ resultat }}
+     {% comment %} {% for item in resultat %}
+    <li>
+       deterorie : {{item.Deteriorie}} 
+       Perdu : {{item.Perdu}}
+    </li>
+    <form method="post" action="exemplaire_actions">
+      {% csrf_token %}
+      <input
+        type="hidden"
+        name="exemplaire_id"
+        value="{{ item.Num_ex }}"
+      />
+      <button type="submit" name="action" value="signaler_deterioration">
+        Signaler Détérioration
+      </button>
+      <button type="submit" name="action" value="signaler_perte">
+        Signaler Perte
+      </button>
+      <button type="submit" name="action" value="rendre_inempruntable">
+        Rendre Inempruntable
+      </button>
+    </form>
+    {% endfor %}  {% endcomment %}
+    {% endif %} 
+  </div>
+
+  {% endblock %}
+</div>

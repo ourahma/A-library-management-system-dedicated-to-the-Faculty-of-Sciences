@@ -1,0 +1,185 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% load tz %} 
+<style>
+  .light-red-bg {
+    background-color: #ffcccc !important; 
+}
+
+</style>
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
+    <div class="container-fluid justify-content-center align-items-center">
+      <center><h2 style="margin:20px;">Vos Emprunts </h2></center>
+        <div class="row">
+          {% if emprunts %}
+            {% for emprunt in emprunts %}
+              <div class="col-12">
+                 <div class="card mb-3 {% if emprunt.exemplaire.perdu or emprunt.exemplaire.deteriore %}light-red-bg  {% endif %}">
+                  <div class="row g-0">
+                    <div class="col-md-4">
+                      <img src="{{ emprunt.exemplaire.ouvrage.image.url }}" class="img-fluid rounded-start" alt="..." width="50%">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title">{{ emprunt.exemplaire.ouvrage.titre }} </h5>
+                        <p class="card-text">
+                          <br>
+                          <p><strong>Description : </strong>{{  emprunt.exemplaire.ouvrage.description }}</p>
+                          <p><strong>Type : </strong>{{  emprunt.exemplaire.ouvrage.type }}</p>
+                          <p> <strong>Categorie : </strong>{{  emprunt.exemplaire.ouvrage.categorie.nom_categorie }}</p><br>
+                          <p style="display:inline;"><strong>Etat: </strong>
+                            {% if emprunt.exemplaire.perdu and emprunt.exemplaire.deteriore %}
+                                <span style="color:red;">L'exemplaire est signalé perdu et détérioré</span>
+                            {% elif emprunt.exemplaire.perdu %}
+                                <span style="color:red;">L'exemplaire est signalé perdu</span>
+                            {% elif emprunt.exemplaire.deteriore %}
+                                <span style="color:red;">L'exemplaire est signalé détérioré</span>
+                            {% else %}
+                                <span style="color:green;">L'exemplaire est en cours d'utilisation</span>
+                            {% endif %}
+                        </p>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <label for="date_retour">Date de  Retour</label>
+                            <input type="date" id="date_retour" 
+                            value="{{ emprunt.date_retour|date:'Y-m-d' }}" 
+                            name="date_retour" class="form-control">
+                          </div>
+                        </div>
+                        <br><br>
+                        
+                        </p>
+                        <div class="exemplaire_actions">
+                         
+                         {% if not emprunt.exemplaire.perdu %}
+                         <button type="button" data-index="{{  emprunt.exemplaire.id_exemplaire }}" 
+                         id="signaler_perte"
+                         class="btn btn-danger">
+                         <i class="bi bi-exclamation-triangle"></i>
+                           Signaler Perte
+                         </button>
+                         {% endif %}
+                          
+                          
+                          
+                          {% if not emprunt.exemplaire.deteriore %}
+                          <button type="button" data-index="{{  emprunt.exemplaire.id_exemplaire  }}" 
+                          id="signlaer_deterioration"
+                          class="btn btn-warning">
+                          <i class="bi bi-exclamation-circle"></i>
+                            Signaler Détérioration 
+                          </button>
+                          {% endif %}
+                            
+                          
+                          
+                          {% if not emprunt.exemplaire.perdu and not emprunt.exemplaire.deteriore %}
+                          <button type="button" data-index="{{ emprunt.id_emprunt }}" 
+                          id="prolonger_date_retour" class="btn btn-success">
+                            <i class="bi bi-clock-history"></i>
+                            Prolonger la date de retour 
+                        </button>
+                          {% endif %}
+                            
+                          
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <br><br><b><br><br><br><br><br>
+            <center><h4>Vous n'avez Aucun Emprunt !!</h4></center>
+            <br><br><b><br><br><br><br><br>
+          {% endif %}
+        </div>
+      </div>
+
+
+      <script>
+        $(document).on('click','#signaler_perte',function(e){
+            e.preventDefault();
+            var exemplaire_id=$(this).data('index');
+            console.log(exemplaire_id)
+            $.ajax({
+                type:'POST',
+                url:"{% url 'signaler_perte' %}",
+                data:{
+                  exemplaire_id:exemplaire_id,
+                  csrfmiddlewaretoken:'{{ csrf_token }}',
+                  action: 'post'
+                },
+                success:function(json){
+                   location.reload();
+                   location.reload();
+          
+                },
+                error:function(xbr,errmsg,err){
+                    console.log(err);
+                    location.reload();
+                }
+            })
+          })
+
+
+          $(document).on('click','#signlaer_deterioration',function(e){
+            e.preventDefault();
+            var exemplaire_id=$(this).data('index');
+            console.log(exemplaire_id)
+            $.ajax({
+                type:'POST',
+                url:"{% url 'signlaer_deterioration' %}",
+                data:{
+                  exemplaire_id:exemplaire_id,
+                  csrfmiddlewaretoken:'{{ csrf_token }}',
+                  action: 'post'
+                },
+                success:function(json){
+                   location.reload();
+                   location.reload();
+          
+                },
+                error:function(xbr,errmsg,err){
+                    console.log(err);
+                    location.reload();
+                }
+            })
+          });
+          
+            $(document).on('click','#prolonger_date_retour',function(e){
+              e.preventDefault();
+              var id_emprunt=$(this).data('index');
+              var new_return_date = $("#date_retour").val(); 
+              console.log(id_emprunt, new_return_date);
+              $.ajax({
+                  type:'POST',
+                  url:"{% url 'prolonger_date_retour' %}",
+                  data:{
+                    id_emprunt:id_emprunt,
+                    new_return_date: new_return_date, 
+                    csrfmiddlewaretoken:'{{ csrf_token }}',
+                    action: 'post'
+                  },
+                  success:function(json){
+                     console.log("Prolonggation sucess")
+                     location.reload();
+                  },
+                  error:function(xhr,errmsg,err){
+                      console.log(err);
+                      console.log("Prolonggation error")
+                      location.reload();
+                  }
+              })
+            });
+          
+          
+      </script>
+        
+{% endblock content %}
+    

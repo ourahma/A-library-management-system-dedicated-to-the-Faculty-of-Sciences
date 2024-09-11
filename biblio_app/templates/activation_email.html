@@ -1,0 +1,12 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktranslate %}Vous recevez cet email car vous avez créé un compte utilisateur sur {{ site_name }}. Veuillez activer votre compte en cliquant sur le lien ci-dessous :{% endblocktranslate %}
+
+{{ protocol }}{{ activation_link }}
+
+{% translate 'Votre adresse email :' %} {{ user.email }}
+
+{% translate "Merci d'utiliser notre site !" %}
+
+{% blocktranslate %}{% endblocktranslate %}
+{% endautoescape %}

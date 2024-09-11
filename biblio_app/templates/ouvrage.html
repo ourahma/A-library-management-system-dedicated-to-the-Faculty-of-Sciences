@@ -1,0 +1,371 @@
+{% extends 'admin_nav.html' %}{% block content %}
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+    
+    button{
+      margin-bottom: 5px;
+    }
+    /* Add custom CSS styles for table */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    /* Add margin to pagination */
+    .pagination {
+      margin-top: 20px;
+    }
+  </style>
+  <script>
+    const csrfToken = '{{ csrf_token }}';
+   document.addEventListener('DOMContentLoaded', function () {
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+    const searchText = this.value.toLowerCase();
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    tableRows.forEach(row => {
+        let found = false;
+        row.querySelectorAll('td').forEach(cell => {
+            const cellText = cell.textContent.toLowerCase();
+            if (cellText.includes(searchText)) {
+                found = true;
+            }
+        });
+
+        if (found) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    $('.modify-btn').click(function() {
+        var ISBN_G = $(this).data('ouvrage-id');
+        var titre = $(this).data('titre');
+        var type = $(this).data('type');
+        var auteur = $(this).data('auteur');
+        var categorie = $(this).data('categorie');
+        var edition = $(this).data('edition');
+        var image = $(this).data('image');
+        var description = $(this).data('description');
+
+        $('#ISBN_G').val(ISBN_G);
+        $('#ntitre').val(titre);
+        $('#ntype').val(type);
+        $('#nauteur').val(auteur);
+        $('#ncategorie').val(categorie);
+        $('#nedition').val(edition);
+        $('#nimage').attr('src', image);
+        $('#ndescription').val(description);
+      });
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const ISBN_G = this.getAttribute('data-ISBN');
+            const confirmation = confirm("Est-ce-que vous etes sure ?");
+
+            if (confirmation) {
+                fetch(`/supprimer_ouvrage/${ISBN_G}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}' // Ensure to include the CSRF token
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                    // Handle success response
+                    console.log(data);
+                    // Redirect to another page
+                    location.reload();
+                })
+                    .catch(error => {
+                        // Handle errors
+                        console.error('Error:', error);
+                        location.reload();
+                    });
+            }
+        });
+    });
+});
+
+  </script>
+
+<div class="container mt-5">
+  <!-- Button to trigger modal -->
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+    Ajouter ouvrage
+  </button>
+<br><br>
+
+  <input type="text" class="form-control mb-3" id="searchInput" placeholder="Rechercher ouvrage">
+
+  <!-- Modal -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel">Ajouter ouvrage</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Form to add category -->
+          <form id="addOuvrageForm" method="post" action="{% url 'add_ouvrage' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+              <!-- <label for="nom_categorie">Category id:</label>
+              <input type="text" class="form-control" id="id_categorie" name="id_categorie" required> -->
+             
+              <input type="text"  class="form-control" id="ISBN" name="ISBN" required placeholder="ISBN:"><br><br>
+              <input type="text"  class="form-control" id="titre" name="titre" required placeholder="Titre:"><br><br>
+              
+            
+              <input type="text"  class="form-control" id="type" name="type" required placeholder="Type:"><br><br>
+              
+              <input type="text" class="form-control" id="auteur" name="auteur" required placeholder="Auteur:"><br><br>
+              <input type="text" class="form-control" id="edition" name="edition" required placeholder="Edition:"><br><br>
+
+              
+              
+              
+              <label for="categorie">Categorie:</label>
+              <select id="categorie"  class="form-control" name="categorie" required>
+                  {% for category in categories %}
+                          <option value="{{ category.id_categorie }}" selected>{{ category.nom_categorie }}</option>
+                  {% endfor %}
+              </select><br><br>
+              
+              <label for="image">Image:</label>
+              <input type="file"  class="form-control" id="image" name="image" required><br><br>
+              
+              <textarea id="description"  class="form-control" name="description" rows="4" cols="50" placeholder="Description:"></textarea><br><br>
+            </div>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <!-- Bootstrap Modal for modification -->
+   <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" aria-labelledby="modifyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modifyModalLabel">Modifier ouvrage</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="modifyOuvrageForm" method="post" action="{% url 'modifier_ouvrage' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+
+              <input type="text" class="form-control" id="ISBN_G" name="ISBN" readonly><br><br>
+
+              <label for="ntitre">Nouveau titre:</label>
+              <input type="text" class="form-control" id="ntitre" name="titre" required><br><br>
+
+              <label for="ntype">Nouveau type:</label>
+              <input type="text"  class="form-control" id="ntype" name="type" required><br><br>
+              
+              <label for="nauteur">Nouveau auteur:</label>
+              <input type="text" class="form-control" id="nauteur" name="auteur" required><br><br>
+              
+              <label for="ncategorie">Nouvelle Categorie:</label>
+              <select id="ncategorie"  class="form-control" name="categorie" required>
+                  {% for category in categories %}
+                          <option value="{{ category.id_categorie }}" selected>{{ category.nom_categorie }}</option>
+                  {% endfor %}
+              </select><br><br>
+              
+              <label for="nedition">Nouvelle Edition:</label>
+              <input type="text" class="form-control" id="nedition" name="edition" required><br><br>
+              
+              
+              <label for="nimage">Nouvelle Image:</label>
+              <input type="file"  class="form-control" id="nimage" name="image" required><br><br>
+              
+              <label for="ndescription">Nouvelle Description:</label><br>
+              <textarea id="ndescription"  class="form-control" name="description" rows="4" cols="50"></textarea><br><br>
+            </div>
+            <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+          <button type="submit" class="btn btn-primary" id="modifySubmit">Enregistrer</button>
+        </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <h2>Ouvrages</h2>
+    <table class="table">
+      <thead>
+        <tr> 
+          <th>Image</th>
+          <th>ISBN</th>
+          <th>Titre</th>
+          <th>Type</th>
+          <th>Auteur</th>
+          <th>Categories</th>
+          <th>Edition</th>
+          <th style="max-width: 200px;" >Description</th>
+          <th style="max-width: 120px;">Exemplaires</th>
+          <th>Actions</th> <!-- Add a new header for actions -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for ouvrage in ouvrages %}
+          <tr>
+            <td>
+              {% if ouvrage.image %}
+              <img src="{{ ouvrage.image.url }}" alt="Ouvrage Image" style="max-width: 100px;">
+                {% else %}
+                  No Image
+                {% endif %}
+            </td>
+            <td>{{ ouvrage.ISBN }}</td>
+            <td>{{ ouvrage.titre }}</td>
+            <td>{{ ouvrage.type }}</td>
+            <td>{{ ouvrage.auteur }}</td>
+            <td>{{ ouvrage.categorie.nom_categorie }}</td>
+            <td>{{ ouvrage.edition }}</td>
+            <td><div style="width: 120px; overflow: auto;">
+              {{ ouvrage.description }}
+          </div></td>
+            <td>{{ ouvrage.num_exmp_dispo }}/{{ ouvrage.num_exemplaire }}</td>
+            <td>
+            <!-- Button to trigger modify modal -->
+            <button class="btn btn-primary modify-btn" data-toggle="modal" data-target="#modifyModal" data-ouvrage-id="{{ ouvrage.ISBN }}"   
+            data-titre="{{ ouvrage.titre }}"
+            data-type="{{ ouvrage.type }}"
+            data-auteur="{{ ouvrage.auteur }}"
+            data-categorie="{{ ouvrage.categorie.id_categorie }}"
+            data-edition="{{ ouvrage.edition }}"
+            data-image="{{ ouvrage.image }}"
+            data-description="{{ ouvrage.description }}"
+            data-num_exemplaire="{{ ouvrage.num_exemplaire }}"
+            data-num_exmp_dispo="{{ ouvrage.num_exmp_dispo }}">Modifier</button>
+            <!-- Button to trigger deletion (you can implement this similarly) -->
+            <button class="btn btn-danger delete-btn" data-ISBN="{{ ouvrage.ISBN }}">Supprimer</button>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    <div class="pagination">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+              {% if ouvrages.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+              {% endif %}
+              {% for num in ouvrages.paginator.page_range %}
+              <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+              {% endfor %}
+              {% if ouvrages.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+              {% endif %}
+          </ul>
+      </nav>
+    </div>
+</div>
+<script>
+  //add Ouvrage
+  document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'addOuvrageForm') {
+        event.preventDefault();
+        
+        // Send AJAX request
+        var formData = new FormData(event.target);
+        fetch(event.target.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Replace with your CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle JSON response
+            console.log(data);
+            // Reload the page only if needed
+            if (data.message) {
+                location.reload();
+            }
+            else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            location.reload();
+        });
+    }
+});
+
+
+//modify Ouvrage
+document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'modifyOuvrageForm') {
+        event.preventDefault();
+        
+        // Send AJAX request
+        var formData = new FormData(event.target);
+        fetch(event.target.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Replace with your CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle JSON response
+            console.log(data);
+            // Reload the page only if needed
+            if (data.message) {
+                location.reload();
+            }
+            else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            location.reload();
+        });
+    }
+});
+</script>
+{% endblock content %}

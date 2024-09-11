@@ -1,0 +1,133 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/exemplaires.css' %}" />
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+  rel="stylesheet"
+/>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+  .search {
+    margin: 5px;
+  }
+</style>
+<section class="exemplaires">
+  <form
+    class="d-flex"
+    role="search"
+    style="margin-top: 20px; margin-bottom: 20px"
+    method="get"
+    action="{% url 'search' %}"
+  >
+    {% csrf_token %}
+    <input
+      class="form-control search"
+      type="search"
+      name="exemplaire"
+      placeholder="Search"
+      aria-label="Search"
+    />
+    <select
+      class="form-select search"
+      aria-label="Default select example"
+      name="ouvrage_type"
+    >
+      {% if ouvrages %} {% for ouvrage in ouvrages %}
+      <option value="{{ ouvrage.type }}">{{ouvrage.type}}</option>
+      {% endfor %} {% endif %}
+      <option value="tous_ouvrages" selected>Tous les ouvrages</option>
+    </select>
+    <select
+      class="form-select search"
+      aria-label="Default select example"
+      n
+      name="categorie"
+    >
+      {% if categories %} {% for categorie in categories %}
+      <option value="{{categorie.nom_categorie}}">
+        {{categorie.nom_categorie}}
+      </option>
+      {% endfor %} {% endif %}
+      <option value="tous_categories" selected>Tous les categories</option>
+    </select>
+    <div class="btn btn-outline-secondary search" type="submit">
+      <button type="submit"><i class="bi bi-search"></i></button>
+    </div>
+  </form>
+  <div class="container">
+    <div class="row">
+      {% if ouvrages %} {% for ouvrage in ouvrages %}
+      <div class="col-md-3">
+        <div class="wsk-cp-product">
+          <div class="wsk-cp-img">
+            <img src="{{ ouvrage.image.url }}" alt="" />
+          </div>
+          <div class="wsk-cp-text">
+            <div class="category">
+              <span>{{ ouvrage.titre }}</span>
+            </div>
+            <div class="title-product">
+              <h3>{{ ouvrage.auteur }}</h3>
+            </div>
+            <div class="description-prod">
+              <p>{{ ouvrage.description }}</p>
+            </div>
+            <div class="card-footer">
+              {% if ouvrage.num_exmp_dispo > 1 %}
+              <span class="ouvrage_disponible"> Disponible </span>
+              {% elif ouvrage.num_exmp_dispo > 0 %}
+              <span class="ouvrage_consultation_only"> Disponible pour consultation </span>
+              {% else %}
+              <span class="ouvrage_non_disponible"> Hors stock </span>
+              {% endif %}
+              <p><a href="{% url 'ouvrage' ouvrage.ISBN %}">Lire plus</a></p>
+              <div class="wcf-right">
+                {% if request.user.role == 'BIBLIOTHECAIRE' or request.user.role == 'UTILISATEUR'  %}
+                {% if request.user.is_authenticated %}
+                <button
+                  class="buy-btn"
+                  value="{{ ouvrage.ISBN }}"
+                  id="add-cart-{{ ouvrage.ISBN }}"
+                >
+                  <i class="fa" style="font-size: 24px">&#xf02d;</i>
+                </button>
+                {% endif %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %} {% else %}
+      <center>
+        <p>Aucun résultat pour votre recherche</p>
+      </center>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+  $(document).on("click", '[id^="add-cart"]', function (e) {
+    e.preventDefault();
+    var isbn = $(this).val();
+    console.log(isbn);
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'cart_add' %}",
+      data: {
+        ouvrage_id: isbn,
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+        action: "post",
+      },
+      success: function (json) {
+        console.log(json);
+        location.reload();
+      },
+      error: function (xbr, errmsg, err) {
+        console.log(err);
+      },
+    });
+  });
+</script>

@@ -1,0 +1,10 @@
+{% extends 'admin_nav.html' %}{% block content %} {% load static %} 
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="{% static 'css/accueil.css' %}" />
+
+<!-- Main content area -->
+<section class="display_exemplaires">
+  {% include 'exemplaires.html' %}
+</section>
+{% endblock content %}

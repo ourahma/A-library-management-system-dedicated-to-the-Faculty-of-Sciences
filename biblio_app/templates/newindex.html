@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <title>System de gestion de librairie</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="sidebar">
+      <div class="logo_details">
+        <i class="bx bxl-audible icon"></i>
+        <div class="logo_name">System de gestion de bibliothèque</div>
+        <i class="bx bx-menu" id="btn"></i>
+      </div>
+      <ul class="nav-list">
+        <li>
+          <i class="bx bx-search"></i>
+          <input type="text" placeholder="Search....  ">
+          {% comment %} <span class="toolip">Search</span> {% endcomment %}
+        </li>
+        <li>
+          <a href="#">
+            <i class="bx bx-grid-alt"></i>
+            <span class="link_name">DashBoard</span>
+          </a>
+          {% comment %} <span class="tooltip">DashBoard</span> {% endcomment %}
+        </li>
+        <li>
+          <a href="#">
+            <i class="bx bx-user"></i>
+            <span class="link_name">Utilisateurs</span>
+          </a>
+          {% comment %} <span class="tooltip">User</span> {% endcomment %}
+        </li>
+        <li>
+          <a href="#">
+            <i class="bx bx-time"></i>
+            <span class="link_name">Réservations</span>
+          </a>
+          {% comment %} <span class="tooltip">Message</span> {% endcomment %}
+        </li>
+        <li>
+          <a href="#">
+            <i class="bx bx-pie-chart-alt-2"></i>
+            <span class="link_name">Analytique</span>
+          </a>
+          {% comment %} <span class="tooltip">L’analytique</span> {% endcomment %}
+        </li>
+        <li>
+            <a href="#">
+              <i class="bx bx-book"></i>
+              <span class="link_name">Gestion des exemplaires</span>
+            </a>
+            {% comment %} <span class="tooltip">File Manager</span> {% endcomment %}
+          </li>
+          <li>
+            <a href="#">
+              <i class="bx bx-cart-alt"></i>
+              <span class="link_name">Les emprunts</span>
+            </a>
+            {% comment %} <span class="tooltip">Order</span> {% endcomment %}
+          </li>
+          <li>
+            <a href="#">
+              <i class="bx bx-cog"></i>
+              <span class="link_name">Parametres</span>
+            </a>
+            <a href="#">
+              <i class="bx bx-cog"></i>
+              <span class="link_name">Gerer les bibliothecaires</span>
+            </a>
+            {% comment %} <span class="tooltip">Settings</span> {% endcomment %}
+          </li>
+          <li class="profile">
+            <div class="profile_details">
+                <img src="#" alt="profile image">
+                <div class="profile_content">
+                  <div class="name"> Admin' Name</div>
+                <div class="designation">ADMIN</div>
+                </div>
+            </div>
+            <div class="bx bx-log-out" id="log_out"></div>
+          </li>
+      </ul>
+      
+    </div>
+    <section class="home-section">
+      <div class="text">Dashbord</div>
+    </section>
+    
+    <script src="js/script.js"></script>
+  </body>
+</html>

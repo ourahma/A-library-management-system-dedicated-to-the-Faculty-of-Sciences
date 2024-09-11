@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    .exemplaire_actions {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+  .exemplaire_actions a,
+  .exemplaire_actions button {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .exemplaire_actions a i,
+  .exemplaire_actions button i {
+    margin-right: 5px;
+  }
+    .acceuil_ex {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .reserver_ex {
+      background-color: #ffc107;
+      color: black;
+    }
+    
+    .emprunter_ex {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .exemplaire_actions a:hover,
+    .exemplaire_actions button:hover {
+      opacity: 0.8;
+    }
+  </style>
+ <div class="card mb-3">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <img src="{{ ouvrage.image.url }}" class="img-fluid rounded-start" alt="...">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{ ouvrage.titre }}</h5>
+          <p class="card-text">
+            <br>
+            <strong>Description : </strong>{{ ouvrage.description }}</p>
+            <strong>Type : </strong>{{ ouvrage.type }}</p>
+            <strong>Categorie : </strong>{{ ouvrage.categorie.nom_categorie }}</p><br>
+          <div class="exemplaire_actions">
+           
+      
+            {% if ouvrage.num_exmp_dispo > 1 %}
+            <button type="button" data-index="{{ ouvrage.ISBN }}" 
+            class="add-cart bg-green-800 py-2 px-4 text-white rounded hover:opacity-80" >
+              <i class="bi bi-book-half mr-2"></i>
+               Ajouter à la liste
+            </button>
+            {% endif %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    $(document).on('click', '.add-cart', function(e) {
+        e.preventDefault();
+        var isbn = $(this).data('index');
+        console.log(isbn);
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'cart_add' %}",
+            data: {
+                ouvrage_id: isbn,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
+            success: function(json) {
+                console.log(json);
+                location.reload(); 
+            },
+            error: function(xhr, errmsg, err) {
+                console.log(err);
+                location.reload();
+            }
+        });
+    });
+  </script> 
+{% endblock content %}

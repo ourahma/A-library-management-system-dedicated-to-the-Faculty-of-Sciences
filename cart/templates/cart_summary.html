@@ -1,0 +1,203 @@
+{% extends 'base.html' %} 
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<br /><br />
+<style>
+ 
+  
+  .exemplaire_actions i,
+  .exemplaire_actions button i {
+    margin-right: 5px;
+  }
+  
+  
+</style>
+
+<div class="container-fluid justify-content-center align-items-center">
+  <div class="row">
+    {% if cart_exemplaires %}
+    <center>
+      <div class="row justify-content-center align-items-center">
+        <div class="col-auto">
+          <button type="button" 
+          id="deleteAllfromBin" 
+          class="btn btn-danger">
+            <i class="bi bi-trash-fill"></i>
+            Supprimer Tous
+          </button>
+        </div>
+        <div class="col-auto">
+          <button type="button" 
+          id="reservertous"
+          class="btn btn-warning">
+            <i class="bi bi-hourglass-split"></i>
+            Reserver Tous
+          </button>
+        </div>
+        <div class="col-auto">
+          <div class="form-group">
+            <label for="date_debut_emprunt">Date de début d'emprunt</label>
+            <input type="date" id="date_debut_emprunt_tous" name="date_debut_emprunt" class="form-control">
+          </div>
+        </div>
+      </div>
+    </center>
+    
+    <br><br><br>
+      {% for cart_exemplaire in cart_exemplaires %}
+        <div class="col-12">
+          <div class="card mb-3">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img src="{{ cart_exemplaire.image.url }}" class="img-fluid rounded-start" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{ cart_exemplaire.titre }}</h5>
+                  <p class="card-text">
+                    <br>
+                    <strong>Description : </strong>{{ cart_exemplaire.description }}</p>
+                    <strong>Type : </strong>{{ cart_exemplaire.type }}</p>
+                    <strong>Categorie : </strong>{{ cart_exemplaire.categorie.nom_categorie }}</p><br>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label for="date_debut_emprunt_{{ cart_exemplaire.ISBN }}">Date de début d'emprunt</label>
+                        <input type="date" id="date_debut_emprunt_{{ cart_exemplaire.ISBN }}" name="date_debut_emprunt_{{ cart_exemplaire.ISBN }}" class="form-control" required>
+                      </div>
+                    </div>
+                    <br><br>
+                  <div class="exemplaire_actions">
+                   
+                    <button type="button" data-index="{{ cart_exemplaire.ISBN }}" 
+                    id="supprimer_ex"
+                    class="btn btn-danger">
+                      <i class="bi bi-trash-fill"></i>
+                      Supprimer
+                    </button>
+                    
+                      <button type="button" data-index="{{ cart_exemplaire.ISBN }}" 
+                    id="reserver"
+                    class="btn btn-warning">
+                      <i class="bi bi-hourglass-split"></i>
+                      Reserver
+                    </button>
+                    
+                    {% comment %} <button type="button" data-index="{{ cart_exemplaire.ISBN }}" class="btn btn-success">
+                      <i class="bi bi-book"></i>
+                      Emprunter
+                    </button> {% endcomment %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <br><br><b><br><br><br><br><br>
+      <center><h4>You n'avez ajouté aucun exemplaire !!</h4></center>
+      <br><br><b><br><br><br><br><br>
+    {% endif %}
+  </div>
+</div>
+<script>
+$(document).on('click','#supprimer_ex',function(e){
+  e.preventDefault();
+  var ouvrage_isbn=$(this).data('index');
+  console.log(ouvrage_isbn)
+  $.ajax({
+      type:'POST',
+      url:"{% url 'cart_delete' %}",
+      data:{
+          ouvrage_isbn:$(this).data('index'),
+          csrfmiddlewaretoken:'{{ csrf_token }}',
+          action: 'post'
+      },
+      success:function(json){
+         location.reload()
+
+      },
+      error:function(xbr,errmsg,err){
+          console.log(err)
+      }
+  })
+})
+
+$(document).on('click','#reserver',function(e){
+  e.preventDefault();
+  var ouvrage_isbn=$(this).data('index');
+  var date_debut_emprunt = $('#date_debut_emprunt_' + ouvrage_isbn).val();
+  console.log(ouvrage_isbn, date_debut_emprunt);
+  console.log("date",date_debut_emprunt)
+  $.ajax({
+      type:'POST',
+      url:"{% url 'reserver_exemplaire' %}",
+      data:{
+          ouvrage_isbn:ouvrage_isbn,
+          date_debut_emprunt:date_debut_emprunt,
+          csrfmiddlewaretoken:'{{ csrf_token }}',
+          action: 'post'
+      },
+      success:function(json){
+         if (json.status === 'success') {
+            console.log("Reservation successful");
+            location.reload();
+         } else {
+            console.log("Reservation failed: " + json.message);
+            location.reload();
+         }
+      },
+      error:function(xbr,errmsg,err){
+          console.log(err);
+          location.reload();
+      }
+  })
+});
+
+$(document).on('click','#deleteAllfromBin',function(e){
+  e.preventDefault();
+  var ouvrage_isbn=$(this).data('index');
+  console.log(ouvrage_isbn)
+  $.ajax({
+      type:'POST',
+      url:"{% url 'deleteAllfromBin' %}",
+      data:{
+          csrfmiddlewaretoken:'{{ csrf_token }}',
+          action: 'post'
+      },
+      success:function(json){
+         location.reload()
+
+      },
+      error:function(xbr,errmsg,err){
+          console.log(err)
+      }
+  })
+})
+
+$(document).on('click','#reservertous',function(e){
+  var date_debut_emprunt_tous=$('#date_debut_emprunt_tous').val();
+  console.log(date_debut_emprunt_tous);
+  e.preventDefault();
+  $.ajax({
+      type:'POST',
+      url:"{% url 'reserverAll' %}",
+      data:{
+          csrfmiddlewaretoken:'{{ csrf_token }}',
+          date_debut_emprunt_tous:date_debut_emprunt_tous,
+          action: 'post'
+      },
+      success:function(json){
+        console.log("success reserver tous")
+         location.reload()
+
+      },
+      error:function(xbr,errmsg,err){
+          console.log(err)
+      }
+  })
+})
+</script>
+
+<br>
+{% endblock content %}

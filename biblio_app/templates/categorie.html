@@ -1,0 +1,321 @@
+{% extends 'admin_nav.html' %}{% block content %}
+  <title>Ajouter Catégorie</title>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+    /* Add custom CSS styles for table */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    /* Add margin to pagination */
+    .pagination {
+      margin-top: 20px;
+    }
+  </style>
+
+<div class="container mt-5">
+
+
+  <!-- Bouton pour déclencher la modal -->
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+    Ajouter une catégorie
+  </button><br><br>
+
+
+   <!-- Search form -->
+   <form class="form-inline mb-3" id="searchForm">
+    <div class="form-group mr-2">
+      <label for="searchByName">Recherche par nom :</label>
+      <input type="text" class="form-control ml-2" id="searchByName" placeholder="Nom">
+    </div>
+    <div class="form-group mr-2">
+      <label for="searchById">Recherche par ID :</label>
+      <input type="text" class="form-control ml-2" id="searchById" placeholder="ID">
+    </div>
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+  </form>
+
+
+  <!-- Modal d'ajout de categorie-->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel">Ajouter une Catégorie</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Formulaire pour ajouter une catégorie -->
+          <form id="addCategoryForm" method="post" action="{% url 'ajouter_categorie' %}">
+              {% csrf_token %}
+              <div class="form-group">
+                  <label for="nom_categorie">Nom :</label>
+                  <input type="text" class="form-control" id="nom_categorie" name="nom_categorie" required>
+              </div>
+              <div class="form-group">
+                  <label for="description_categorie">Description :</label>
+                  <textarea class="form-control" id="description_categorie" name="description_categorie" rows="3"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">OK</button>
+          </form>
+      </div>
+      
+      </div>
+    </div>
+  </div>
+
+   <!-- Bootstrap Modal pour la modification -->
+   <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" aria-labelledby="modifyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modifyModalLabel">Modifier une catégorie</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="modifyCategoryForm" method="post" action="{% url 'modifier_categorie' %}">
+              {% csrf_token %}
+             
+              <div class="form-group">
+                  <label for="modifiedCategoryName">ID :</label>
+                  <input type="text" class="form-control" id="categoryId" name="id_categorie" readonly>
+              </div>
+              <div class="form-group">
+                  <label for="modifiedCategoryName">Nom :</label>
+                  <input type="text" class="form-control" id="modifiedCategoryName" name="nom_categorie" required>
+              </div>
+              <div class="form-group">
+                  <label for="modifiedCategoryDescription">Description :</label>
+                  <textarea class="form-control" id="modifiedCategoryDescription" name="description_categorie" rows="3"></textarea>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                  <button type="submit" class="btn btn-primary" id="modifySubmit">Enregistrer</button>
+              </div>
+          </form>
+      </div>
+      
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <h2>Categories</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom</th>
+          <th>Description</th>
+          <th>Actions</th> <!-- Ajout d'un en-tête pour les actions -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for categorie in categories %}
+          <tr>
+            <td>{{ categorie.id_categorie }}</td>
+            <td>{{ categorie.nom_categorie }}</td>
+            <td>{{ categorie.description_categorie }}</td>
+            <td>
+                <!-- Bouton pour déclencher la modal de modification -->
+            <button class="btn btn-primary modify-btn" data-toggle="modal" data-target="#modifyModal" data-categorie-id="{{ categorie.id_categorie }}" data-nom_categorie ="{{ categorie.nom_categorie }}"
+            data-description_categorie="{{ categorie.description_categorie }}">Modifier</button>
+            <!-- Bouton pour déclencher la suppression -->
+            <button class="btn btn-danger delete-btn" data-id_categorie="{{ categorie.id_categorie }}">Supprimer</button>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    <div class="pagination" style="margin-bottom: 15px; margin-top: 10px;">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+              {% if categories.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+              {% endif %}
+              {% for num in categories.paginator.page_range %}
+              <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+              {% endfor %}
+              {% if categories.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+              {% endif %}
+          </ul>
+      </nav>
+    </div>
+</div>
+
+<script>
+  const csrfToken = '{{ csrf_token }}';
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    $('.modify-btn').click(function() {
+        var categoryId = $(this).data('categorie-id');
+        var nom_categorie = $(this).data('nom_categorie');
+        var description_categorie = $(this).data('description_categorie');
+
+        $('#categoryId').val(categoryId);
+        $('#modifiedCategoryName').val(nom_categorie);
+        $('#modifiedCategoryDescription').val(description_categorie);
+      });
+    $('.modify-btn').click(function() {
+        var categoryId = $(this).data('categorie-id');
+        $('#categoryId').val(categoryId);
+      });
+      
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const categoryId = this.getAttribute('data-id_categorie');
+            const confirmation = confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?");
+
+            if (confirmation) {
+                fetch(`/supprimer_categorie/${categoryId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}' 
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('La réponse du réseau n\'était pas correcte');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                    // Traitement de la réponse en cas de succès
+                    console.log(data);
+                    // Redirection vers une autre page
+                    location.reload();
+                })
+                    .catch(error => {
+                        // Gestion des erreurs
+                        console.error('Erreur :', error);
+                        location.reload();
+                    });
+            }
+        });
+    });
+  });
+
+  $(document).ready(function() {
+    // Handle form submission for search
+    $('#searchForm').submit(function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        // Get search values
+        const name = $('#searchByName').val().trim().toLowerCase();
+        const id = $('#searchById').val().trim().toLowerCase();
+
+        // Filter table rows based on search criteria
+        $('tbody tr').each(function() {
+            const rowName = $(this).find('td:eq(1)').text().trim().toLowerCase();
+            const rowId = $(this).find('td:eq(0)').text().trim().toLowerCase();
+
+            // Show or hide table rows based on search criteria
+            if ((name === '' || rowName.includes(name)) && (id === '' || rowId === id)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+
+        // Clear input fields (optional)
+        $('#searchByName').val('');
+        $('#searchById').val('');
+    });
+});
+
+//add category
+document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'addCategoryForm') {
+        event.preventDefault();
+        
+        // Send AJAX request
+        var formData = new FormData(event.target);
+        fetch(event.target.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Replace with your CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle JSON response
+            console.log(data);
+            // Reload the page only if needed
+            if (data.message) {
+                location.reload();
+            }
+            else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            location.reload();
+        });
+    }
+});
+
+
+
+//modify category
+document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'modifyCategoryForm') {
+        event.preventDefault();
+        
+        // Send AJAX request
+        var formData = new FormData(event.target);
+        fetch(event.target.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Replace with your CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle JSON response
+            console.log(data);
+            // Reload the page only if needed
+            if (data.message) {
+                location.reload();
+            }
+            else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            location.reload();
+        });
+    }
+});
+
+</script>
+{% endblock content%}

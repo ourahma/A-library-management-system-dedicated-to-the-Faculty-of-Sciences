@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tz %}  <!-- Load timezone template tags -->
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="container-fluid justify-content-center align-items-center">
+  <center><h4 style="margin:20px;">Vos Réservations </h4></center>
+  <div class="row">
+    {% if reservations %}
+      {% for reservation in reservations %}
+        <div class="col-12">
+          <div class="card mb-3">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img src="{{ reservation.ouvrage.image.url }}" class="img-fluid rounded-start" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{ reservation.ouvrage.titre }}</h5>
+                  <p class="card-text">
+                    <br>
+                    <strong>Description : </strong>{{ reservation.ouvrage.description }}</p>
+                    <strong>Type : </strong>{{ reservation.ouvrage.type }}</p>
+                    <strong>Categorie : </strong>{{ reservation.ouvrage.categorie.nom_categorie }}</p><br>
+                  <div class="col-auto">
+                    <div class="form-group">
+                      <label for="date_debut_emprunt_{{ reservation.id }}">Date de début d'emprunt</label>
+                      <input type="date" id="date_debut_emprunt_{{ reservation.id_reservation }}" 
+                      name="date_debut_emprunt" value="{{ reservation.date_emprunt|date:'Y-m-d' }}" 
+                      class="form-control">
+                    </div>
+                  </div>
+                  <br><br>
+                  <div class="exemplaire_actions">
+                    <button type="button" data-index="{{ reservation.ouvrage.ISBN }}" 
+                    id="supprimer_ex"
+                    class="btn btn-danger">
+                      <i class="bi bi-trash-fill"></i>
+                      Annuler
+                    </button>
+                    <button type="button" data-index="{{ reservation.id_reservation }}" 
+                    id="modifier_reservation"
+                    class="btn btn-warning">
+                      <i class="bi bi-book-fill"></i>
+                     Modifier la date de debut d'emprunt
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <br><br><b><br><br><br><br><br>
+      <center><h4>Vous n'avez Aucune réservation !!</h4></center>
+      <br><br><b><br><br><br><br><br>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  $(document).on('click','#supprimer_ex',function(e){
+    e.preventDefault();
+    var ouvrage_isbn=$(this).data('index');
+    console.log(ouvrage_isbn)
+    $.ajax({
+      type:'POST',
+      url:"{% url 'annuler_reservation' %}",
+      data:{
+        ouvrage_isbn:ouvrage_isbn,
+        csrfmiddlewaretoken:'{{ csrf_token }}',
+        action: 'post'
+      },
+      success:function(json){
+        location.reload();
+      },
+      error:function(xbr,errmsg,err){
+        console.log(err);
+      }
+    })
+  });
+
+  $(document).on('click','#modifier_reservation',function(e){
+    e.preventDefault();
+    var id_reservation=$(this).data('index');
+    var date_debut_emprunt = $('#date_debut_emprunt_' + id_reservation).val();
+    console.log(id_reservation);
+    console.log("date", date_debut_emprunt)
+    $.ajax({
+        type:'POST',
+        url:"{% url 'modifier_reservation' %}",
+        data:{
+            id_reservation:id_reservation,
+            date_debut_emprunt:date_debut_emprunt,
+            csrfmiddlewaretoken:'{{ csrf_token }}',
+            action: 'post'
+        },
+        success:function(json){
+           if (json.status === 'success') {
+              console.log("Reservation successful");
+              location.reload();
+           } else {
+              console.log("Reservation failed: " + json.message);
+              location.reload();
+           }
+        },
+        error:function(xbr,errmsg,err){
+            console.log(err)
+            location.reload();
+        }
+    })
+  });
+</script>
+
+{% endblock content %}

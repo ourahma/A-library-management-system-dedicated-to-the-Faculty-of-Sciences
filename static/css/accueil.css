@@ -1,0 +1,65 @@
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+:root {
+  --default-blue: #76deff;
+  --second-blue: #12568e;
+  --gray: #fbfdfc;
+}
+.acceuil_header{
+  display: flex;
+  flex-direction: row;
+}
+.page_acceuil {
+  display: flex;
+  flex-direction: column;
+}
+main {
+  flex: 1;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.main-tag h2 {
+  position: relative;
+  font-size: 40px;
+  top: 10px;
+  left: 25px;
+}
+
+.main-tag h2 span {
+  color: var(--second-blue);
+  font-family: "Dancing Script", cursive;
+}
+
+.main-tag h2 p {
+  width: 650px;
+  text-align: justify;
+  line-height: 22px;
+  position: relative;
+  top: 125px;
+  left: 25px;
+}
+.main-tag .main_btn {
+  background-color: var(--default-blue);
+  padding: 10px 20px;
+  position: relative;
+  top: 190px;
+  left: 25px;
+  color: #fff;
+  text-decoration: none;
+}
+.main-tag p {
+  margin: 20px 10px 0 10px;
+  font-size: 16px;
+  text-align: center;
+  font-weight: 500;
+}
+.main_img img {
+  width: 500px;
+  height: 500px;
+  position: relative;
+  left: 20px;
+}

@@ -1,0 +1,31 @@
+{% extends "admin_nav.html" %} {% block content %}
+<h2>Notifications</h2>
+{% if notifications %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Notification</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for notification in notifications %}
+    <tr class="{% if notification.read %}table-secondary{% endif %}">
+      <td>{{ notification.message }}</td>
+      <td>
+        {% if not notification.read %}
+        <a
+          href="{% url 'mark_notification_as_read' notification.id %}"
+          class="btn btn-primary"
+        >
+          Marquer comme lu
+        </a>
+        {% else %} Read {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No new notifications.</p>
+{% endif %} {% endblock %}

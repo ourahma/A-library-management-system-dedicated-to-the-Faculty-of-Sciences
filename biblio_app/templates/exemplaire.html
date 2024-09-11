@@ -1,0 +1,404 @@
+{% extends 'admin_nav.html' %}
+{% load static %}
+{% block content %}
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+    .checking{
+      margin-right: 10px;
+    }
+    button{
+      margin: 5px;
+    }
+    /* Add custom CSS styles for table */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 5px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    /* Add margin to pagination */
+    .pagination {
+      margin-top: 20px;
+    }
+  </style>
+  <script>
+    const csrfToken = '{{ csrf_token }}';
+   document.addEventListener('DOMContentLoaded', function () {
+
+    $('.modify-btn').click(function() {
+    var id_ex = $(this).data('exemplaire-id');
+    var deteriore = $(this).data('deteriore');
+    var perdu = $(this).data('perdu');
+    var empruntable = $(this).data('empruntable');
+    var ouvrage = $(this).data('ouvrage');
+    var disponible = $(this).data('disponible');
+
+    // Set checkbox values in the modal
+    $('#id_ex').val(id_ex);
+    $('#ndeteriore').prop('checked', deteriore === 'True'); // Assuming data is in string format
+    $('#nperdu').prop('checked', perdu === 'True'); // Assuming data is in string format
+    $('#nempruntable').prop('checked', empruntable === 'True'); // Assuming data is in string format
+    $('#ndisponible').prop('checked', disponible === 'True'); // Assuming data is in string format
+
+    // Set the selected option in the select element
+    $('#nouvrage').val(ouvrage);
+});
+
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+    const searchText = this.value.toLowerCase();
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    tableRows.forEach(row => {
+        let found = false;
+        row.querySelectorAll('td').forEach(cell => {
+            const cellText = cell.textContent.toLowerCase();
+            if (cellText.includes(searchText)) {
+                found = true;
+            }
+        });
+
+        if (found) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    $('.modify-btn').click(function() {
+        var id_ex = $(this).data('exemplaire-id');
+        var deteriore = $(this).data('deteriore');
+        var perdu = $(this).data('perdu');
+        var empruntable = $(this).data('empruntable');
+        var ouvrage = $(this).data('ouvrage');
+        var disponible = $(this).data('disponible');
+
+        $('#id_ex').val(id_ex);
+        $('#ndeteriore').val(deteriore);
+        $('#nperdu').val(perdu);
+        $('#nouvrage').val(ouvrage);
+        $('#nempruntable').val(empruntable);
+        $('#ndisponible').val(disponible);
+      });
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const id_ex = this.getAttribute('data-id_exemplaire');
+            const confirmation = confirm("Est-ce-que vous etes sure ?");
+
+            if (confirmation) {
+                fetch(`/delete_exemplaire/${id_ex}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}' // Ensure to include the CSRF token
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                    // Handle success response
+                    console.log(data);
+                    // Redirect to another page
+                    location.reload();
+                })
+                    .catch(error => {
+                        // Handle errors
+                        console.error('Error:', error);
+                        location.reload();
+                    });
+            }
+        });
+    });
+});
+
+  </script>
+
+<div class="container mt-5">
+  <!-- Button to trigger modal -->
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+    Ajouter exemplaire
+  </button>
+<br><br>
+
+  <input type="text" class="form-control mb-3" id="searchInput" placeholder="Rechercher exemplaire">
+
+  <!-- Modal -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel">Ajouter exemplaire</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Form to add category -->
+          <form id="addExemplaireForm" method="post" action="{% url 'add_exemplaire' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+              <!-- <label for="nom_categorie">Category id:</label>
+              <input type="text" class="form-control" id="id_categorie" name="id_categorie" required> -->
+             <br>
+             
+             <label for="ouvrage">Ouvrage :</label>
+              <select id="ouvrage"  class="form-control" name="ouvrage" required>
+                  {% for ouvrage in ouvrages %}
+                          <option value="{{ ouvrage.ISBN }}" selected>{{ ouvrage.titre }}</option>
+                  {% endfor %}
+              </select><br><br>
+
+             <span class="checking">
+              <label for="deteriore">Deteriore</label>
+              <input type="checkbox"  id="deteriore" name="deteriore"  >
+              </span>
+
+              <span class="checking">
+              <label for="perdu">Perdu</label>
+              <input type="checkbox"  id="perdu" name="perdu" >
+              </span>
+
+              <span class="checking">
+              <label for="disponible">Empruntable</label>
+              <input type="checkbox" id="disponible" name="empruntable"  ></span>
+
+              <span class="checking">
+              <label for="disponible">Disponible</label>
+              <input type="checkbox" id="disponible" name="disponible"  ></span><br><br>
+
+              <span class="checking">
+                <label for="nombre">Nombre d'exemplaires : </label>
+                <input type="number" id="nombre" name="nombre" value="1" ></span><br><br>
+
+            </div>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <!-- Bootstrap Modal for modification -->
+   <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" aria-labelledby="modifyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modifyModalLabel">Modifier exemplaire</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="modifyExemplaireForm" method="post" action="{% url 'modifier_exemplaire' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="id_ex">ID :</label>
+              <input type="text" class="form-control" id="id_ex" name="id_exemplaire" readonly><br><br>
+
+              <span class="checking">
+              <label for="ndeteriore">Deteriore</label>
+              <input type="checkbox"  id="ndeteriore" name="deteriore" >
+              </span>
+
+              <span class="checking">
+              <label for="nperdu">Perdu</label>
+              <input type="checkbox" id="nperdu" name="perdu"  ></span>
+
+              <span class="checking">
+              <label for="disponible">Empruntable</label>
+              <input type="checkbox" id="nempruntable" name="empruntable"  ></span>
+
+              <span class="checking">
+              <label for="ndisponible">Disponible</label>
+              <input type="checkbox" id="ndisponible" name="disponible"  ></span><br><br>
+
+              <label for="nouvrage">Ouvrage :</label>
+              <select id="nouvrage"  class="form-control" name="ouvrage" required>
+                  {% for ouvrage in ouvrages %}
+                          <option value="{{ ouvrage.ISBN }}" selected>{{ ouvrage.titre }}</option>
+                  {% endfor %}
+              </select><br><br>
+
+              
+            </div>
+            <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+          <button type="submit" class="btn btn-primary" id="modifySubmit">Enregistrer</button>
+        </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <h2>Exemplaire</h2>
+    <table class="table">
+      <thead>
+        <tr> 
+          <th>ID</th>
+          <th>Ouvrage</th>
+          <th>Deteriore</th>
+          <th>Perdu</th>
+          <th>Empruntable</th>
+          <th>Disponible</th>
+          <th>Actions</th> <!-- Add a new header for actions -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for exemplaire in exemplaires %}
+          <tr>
+            <td>{{ exemplaire.id_exemplaire }}</td>
+            <td style="width: fit-content;">{{ exemplaire.ouvrage.titre }}</td>
+            <td style="text-align: center;">
+              {% if exemplaire.deteriore %}
+              <img src="{% static 'assets/True.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% else %}
+                <img src="{% static 'assets/False.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% endif %}
+            </td>
+            <td style="text-align: center;">
+              {% if exemplaire.perdu %}
+              <img src="{% static 'assets/True.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% else %}
+                <img src="{% static 'assets/False.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% endif %}
+            </td>
+            <td style="text-align: center;">
+              {% if exemplaire.empruntable %}
+              <img src="{% static 'assets/True.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% else %}
+                <img src="{% static 'assets/False.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% endif %}
+            </td>
+            <td style="text-align: center;">
+              {% if exemplaire.disponible %}
+              <img src="{% static 'assets/True.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% else %}
+                <img src="{% static 'assets/False.png' %}" alt="True" style="max-width: 90px;max-height: 40px;  margin: auto;"/>
+              {% endif %}
+            </td>
+            
+            
+            <td>
+            <!-- Button to trigger modify modal -->
+            <button class="btn btn-primary modify-btn" data-toggle="modal" data-target="#modifyModal" data-exemplaire-id="{{ exemplaire.id_exemplaire }}"   
+            data-deteriore="{{ exemplaire.deteriore }}"
+            data-perdu="{{ exemplaire.perdu }}"
+            data-empruntable="{{ exemplaire.empruntable }}"
+            data-ouvrage="{{ exemplaire.ouvrage.ISBN }}"
+            data-disponible="{{ exemplaire.disponible }}">Modifier</button><br>
+            <!-- Button to trigger deletion (you can implement this similarly) -->
+            <button class="btn btn-danger delete-btn" data-id_exemplaire="{{ exemplaire.id_exemplaire }}">Supprimer</button>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    <div class="pagination">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+              {% if exemplaires.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+              {% endif %}
+              {% for num in exemplaires.paginator.page_range %}
+              <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+              {% endfor %}
+              {% if exemplaires.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+              {% endif %}
+          </ul>
+      </nav>
+    </div>
+</div>
+<script>
+  //add Exemplaire
+  document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'addExemplaireForm') {
+        event.preventDefault();
+        
+        // Send AJAX request
+        var formData = new FormData(event.target);
+        fetch(event.target.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Replace with your CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle JSON response
+            console.log(data);
+            // Reload the page only if needed
+            if (data.message) {
+                location.reload();
+            }
+            else {
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+});
+
+
+//modify Exemplaire
+document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'modifyExemplaireForm') {
+        event.preventDefault();
+        
+        // Send AJAX request
+        var formData = new FormData(event.target);
+        fetch(event.target.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Replace with your CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle JSON response
+            console.log(data);
+            // Reload the page only if needed
+            if (data.message) {
+                location.reload();
+            }
+            else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            location.reload();
+        });
+    }
+});
+</script>
+{% endblock content %}

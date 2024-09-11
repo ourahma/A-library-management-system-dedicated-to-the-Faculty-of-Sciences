@@ -1,0 +1,121 @@
+{% extends 'admin_nav.html' %}
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    .exemplaire_actions {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+  .exemplaire_actions a,
+  .exemplaire_actions button {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .exemplaire_actions a i,
+  .exemplaire_actions button i {
+    margin-right: 5px;
+  }
+    .acceuil_ex {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .reserver_ex {
+      background-color: #ffc107;
+      color: black;
+    }
+    
+    .emprunter_ex {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .exemplaire_actions a:hover,
+    .exemplaire_actions button:hover {
+      opacity: 0.8;
+    }
+    .card{
+      margin: 15px;
+      margin-top: 40px;
+    }
+  </style>
+ <div class="card mb-3">
+    <div class="row g-0">
+      <div class="col-md-4" >
+        <img src="{{ ouvrage.image.url }}" class="img-fluid rounded-start" alt="..." >
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{ ouvrage.titre }}</h5>
+          <p class="card-text">
+            <br>
+            <strong>Description : </strong>{{ ouvrage.description }}</p>
+            <strong>Type : </strong>{{ ouvrage.type }}</p>
+            <strong>Categorie : </strong>{{ ouvrage.categorie.nom_categorie }}</p>
+            <strong>Diponibilité : </strong>
+           
+            {% if ouvrage.num_exmp_dispo > 0 %}
+                <span class="ouvrage_disponible">
+                  Disponible
+                </span>
+                {% else %}  
+                <span class="ouvrage_non_disponible">
+                  Hors stock 
+                </span>
+            {% endif %}
+          </p><br>
+          <div class="exemplaire_actions">
+           {% if request.user.role == 'BIBLIOTHECAIRE' %}
+          
+            <button
+                  class="btn btn-success"
+                  value="{{ ouvrage.ISBN }}"
+                  id="add-cart-{{ ouvrage.ISBN }}"
+                >
+                <i class="bi bi-book-half"></i>
+              Ajouter l'exemplaire à votre liste
+            </button>
+            {% endif %}
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    $(document).on("click", '[id^="add-cart"]', function (e) {
+    e.preventDefault();
+    var isbn = $(this).val();
+    console.log(isbn);
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'cart_add' %}",
+      data: {
+        ouvrage_id: isbn,
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+        action: "post",
+      },
+      success: function (json) {
+        console.log(json);
+        location.reload();
+      },
+      error: function (xbr, errmsg, err) {
+        console.log(err);
+      },
+    });
+  });
+</script> 
+{% endblock content %}
+    
+
+
+

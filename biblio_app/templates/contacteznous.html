@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+ <link rel="stylesheet" href="{% static 'css/contacteznous.css' %}"> 
+
+<main>
+    <div class="contact_details">
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="contact_form">
+                        <h2 class="text-center">Contact Us</h2>
+                        <!-- <form action="https://api.web3forms.com/submit" method="POST"> -->
+                            <form action="{% url 'send_notification' %}" method="POST">
+                                {% csrf_token %}
+                            <input type="hidden" name="access_key" value="3ddabbff-bd5a-4bf1-bc61-f169bed5e911">
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="email" class="form-control" id="email" placeholder="Enterz votre email" name="email"  value="{{user.email}}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Votre Message:</label>
+                                <textarea class="form-control" rows="5" id="message" placeholder="Enter your message" name="message" required></textarea>
+                            </div><br><br>
+                            <button type="submit" class="btn btn-primary" id="#envoyer">Envoyer</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <p class="map">
+                        <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3312.8262539446787!2d-5.546257225525346!3d33.86836832741919!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xda04543d863b571%3A0x596632d1a0a0358d!2sFacult%C3%A9%20des%20sciences%20Meknes%D8%8C%20BP%2011201%20Zitoune%2C%20Mekn%C3%A8s%20-%20MAROC%2C%20Mekn%C3%A8s%2050000!5e0!3m2!1sfr!2sma!4v1713647271401!5m2!1sfr!2sma" 
+                        width="100%" height="400" style="border:0;" allowfullscreen="" 
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}

@@ -1,0 +1,325 @@
+{% extends 'admin_nav.html' %}{% block content %}
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+    /* Add custom CSS styles for table */
+    button{
+      margin: 5px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    /* Add margin to pagination */
+    .pagination {
+      margin-top: 20px;
+    }
+  </style>
+  <script>
+    document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'addForm') {
+        event.preventDefault();
+        
+        // Send AJAX request
+        var formData = new FormData(event.target);
+        fetch(event.target.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Replace with your CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle JSON response
+            console.log(data);
+            // Reload the page only if needed
+            if (data.message) {
+                location.reload();
+            }
+            else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            location.reload();
+        });
+    }
+});
+
+
+document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'modifyForm') {
+        event.preventDefault();
+        
+        // Send AJAX request
+        var formData = new FormData(event.target);
+        fetch(event.target.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Replace with your CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle JSON response
+            console.log(data);
+            // Reload the page only if needed
+            if (data.message) {
+                location.reload();
+            }
+            else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            location.reload();
+        });
+    }
+});
+
+
+    const csrfToken = '{{ csrf_token }}';
+   document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('searchInput').addEventListener('input', function () {
+    const searchText = this.value.toLowerCase();
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    tableRows.forEach(row => {
+        let found = false;
+        row.querySelectorAll('td').forEach(cell => {
+            const cellText = cell.textContent.toLowerCase();
+            if (cellText.includes(searchText)) {
+                found = true;
+            }
+        });
+
+        if (found) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    $('.modify-btn').click(function() {
+        var ad_id = $(this).data('bibliothecaire-id');
+        var nom = $(this).data('nom');
+        var prenom = $(this).data('prenom');
+        var telephone = $(this).data('telephone');
+        var email = $(this).data('email');
+        var password = $(this).data('password');
+
+
+        $('#ad_id').val(ad_id);
+        $('#nnom').val(nom);
+        $('#nprenom').val(prenom);
+        $('#ntelephone').val(telephone);
+        $('#nemail').val(email);    
+        $('#npassword').val(password);
+      });
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const ad_id = this.getAttribute('data-id_bibliothecaire');
+            console.info(ad_id)
+            const confirmation = confirm("Est-ce-que vous etes sure ?");
+
+            if (confirmation) {
+                fetch(`/supprimer_bibliothecaire/${ad_id}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}' // Ensure to include the CSRF token
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                    // Handle success response
+                    console.log(data);
+                    // Redirect to another page
+                    location.reload();
+                })
+                    .catch(error => {
+                        // Handle errors
+                        console.error('Error:', error);
+                        location.reload();
+                    });
+            }
+        });
+    });
+});
+
+  </script>
+
+<div class="container mt-5">
+  <!-- Button to trigger modal -->
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+    Ajouter bibliothecaire
+  </button>
+<br><br>
+
+  <input type="text" class="form-control mb-3" id="searchInput" placeholder="Rechercher bibliothecaire">
+
+  <!-- Modal -->
+  <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addModalLabel">Ajouter bibliothecaire</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Form to add -->
+          <form method="post" id="addForm" action="{% url 'ajouter_bibliothecaire' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+             
+              
+              <label for="nom">Nom :</label>
+              <input type="text"  class="form-control" id="nom" name="nom" required><br><br>
+              
+              <label for="prenom">Prenom:</label>
+              <input type="text"  class="form-control" id="prenom" name="prenom" required><br><br>
+              
+              <label for="telephone">telephone :</label>
+              <input type="text" class="form-control" id="telephone" name="telephone" pattern="^(?:\+212[5-7]\d{8}|0[5-7]\d{8})$" required><br><br>
+                 
+              <label for="email">Email:</label>
+              <input type="email" class="form-control" id="email" name="email" pattern="[^@\s]+@(edu\.)?umi\.ac\.ma" required><br><br>
+              
+              <label for="password">Mot de passe:</label>
+              <input type="text"  class="form-control" id="password" name="password" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" required><br><br>
+              
+            </div>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" aria-labelledby="modifyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modifyModalLabel">Modifier bibliothecaire</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="modifyForm" method="post" action="{% url 'modifier_bibliothecaire' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+
+              <input type="text" class="form-control" id="ad_id" name="id_bibliothecaire" readonly><br><br>
+
+              <label for="nnom">Nouveau nom:</label>
+              <input type="text" class="form-control" id="nnom" name="nom" required><br><br>
+
+              <label for="nprenom">Nouveau prenom:</label>
+              <input type="text"  class="form-control" id="nprenom" name="prenom" required><br><br>
+
+              <label for="ntelephone">Nouveau Telephone:</label>
+              <input type="text" class="form-control" id="ntelephone" name="telephone" pattern="^(?:\+212[5-7]\d{8}|0[5-7]\d{8})$" required><br><br>            
+              
+              <label for="nemail">Nouveau email:</label>
+              <input type="email" class="form-control" id="nemail" name="email" pattern="[^@\s]+@(edu\.)?umi\.ac\.ma" required><br><br>
+              
+              <label for="npassword">Nouveau Mot de passe:</label>
+              <input type="text"  class="form-control" id="npassword" name="password" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"><br><br>
+            </div>  
+            <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+          <button type="submit" class="btn btn-primary" id="modifySubmit">Enregistrer</button>
+        </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <h2>Bibliothecaires</h2>
+    <table class="table">
+      <thead>
+        <tr> 
+          <th>ID</th>
+          <th>Nom</th>
+          <th>Prenom</th>
+          <th>Email</th>
+          <th>Telephone</th>
+          <th>Actions</th> <!-- Add a new header for actions -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for bibliothecaire in bibliothecaires %}
+       
+          <tr>
+            <td>{{ bibliothecaire.id_bibliothecaire }}</td>
+            <td>{{  bibliothecaire.nom }}</td>
+            <td>{{  bibliothecaire.prenom }}</td>
+            <td>{{  bibliothecaire.email }}</td>
+            <td>{{  bibliothecaire.telephone }}</td>
+            <td>
+            <!-- Button to trigger modify modal -->
+            <button class="btn btn-primary modify-btn" data-toggle="modal" data-target="#modifyModal" data-bibliothecaire-id="{{ bibliothecaire.id }}"   
+            data-nom ="{{ bibliothecaire.nom }}"
+            data-prenom="{{ bibliothecaire.prenom }}"
+            data-email="{{ bibliothecaire.email }}"
+            data-telephone="{{ bibliothecaire.telephone }}">Modifier</button>
+            <!-- Button to trigger deletion (you can implement this similarly) -->
+            <button class="btn btn-danger delete-btn" data-id_bibliothecaire="{{ bibliothecaire.id }}">Supprimer</button>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    <div class="pagination">
+    
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+              {% if bibliothecaires.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+              {% endif %}
+              {% for num in bibliothecaires.paginator.page_range %}
+              <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+              {% endfor %}
+              {% if bibliothecaires.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+              {% endif %}
+          </ul>
+      </nav>
+    </div>
+</div>
+{% endblock content %}
